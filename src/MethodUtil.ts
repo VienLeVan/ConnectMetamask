@@ -3,9 +3,9 @@ import {ethers, TypedDataDomain, TypedDataField} from 'ethers';
 import {recoverAddress} from '@ethersproject/transactions';
 import {hashMessage} from '@ethersproject/hash';
 import type {Bytes, SignatureLike} from '@ethersproject/bytes';
-import {getTypedDataExample} from '../constants/eip712';
+import {getTypedDataExample} from './eip712';
 import {_TypedDataEncoder} from 'ethers/lib/utils';
-import type {FormattedRpcResponse, RpcRequestParams} from '../types/methods';
+import type {FormattedRpcResponse, RpcRequestParams} from './methods';
 
 export function verifyMessage(
     message: Bytes | string,
@@ -143,7 +143,7 @@ export const sendTransaction = async ({
   const {chainId} = await web3Provider.getNetwork();
 
   const amount = ethers.utils.parseEther('0.0001');
-  const address = '0x0000000000000000000000000000000000000000';
+  const address = '0x22746588A503434fC1173af62a6Aa82159EBeD25';
   const transaction = {
     to: address,
     value: amount,
