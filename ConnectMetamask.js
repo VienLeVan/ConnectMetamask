@@ -62,11 +62,11 @@ const ConnectMetamask = () => {
     const sendTransaction = async () => {
         // Get the signer from the UniversalProvider
 
-        // let web3Provider = new ethers.providers.Web3Provider(provider);
+        let web3Provider = new ethers.providers.Web3Provider(provider);
 
         const signer = web3Provider.getSigner();
         const { chainId } = await web3Provider.getNetwork();
-        const amount = ethers.utils.parseEther('0.0001');
+        const amount = ethers.utils.parseEther('0.00001');
         const ToAddress = '0x22746588A503434fC1173af62a6Aa82159EBeD25';
         const transaction =
         {
