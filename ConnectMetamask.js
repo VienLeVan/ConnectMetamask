@@ -14,14 +14,16 @@ import {
 import axios from "axios";
 import { providerMetadata, sessionParams } from './Config';
 import { BlockchainActions } from "./src/BlockchainActions";
-import { ethers } from 'ethers';
+import { ethers, Contract } from 'ethers';
+import { getType } from './src/Api/ABI/Erc20'
+import { sendTransaction } from './src/MethodUtil';
 
 
 const projectId = "801b302fd99f8b54bc7db7fa08c2d3c3";
 
 const ConnectMetamask = () => {
     const [isShow, setIsShow] = useState(false);
-    const { close, open, isConnected, provider, address } = useWalletConnectModal();
+    const { close, open, isConnected, provider, address, signer } = useWalletConnectModal();
     const [balance, setBalance] = useState(0);
     const getClientId = async () => {
         if (provider && isConnected) {
@@ -38,25 +40,6 @@ const ConnectMetamask = () => {
 
         console.log("Matic Balance:", balance / 10 ** 18);
         setBalance(balance / 10 ** 18);
-
-        // try {
-        //     const response = await axios.post(
-        //         "https://bsc-dataseed.binance.org",
-        //         // "https://convincing-divine-diagram.matic.discover.quiknode.pro/f46a1ffad55010d5f1612797989552405f3601e5/",
-        //         {
-        //             jsonrpc: "2.0",
-        //             id: 1,
-        //             method: "eth_getBalance",
-        //             params: [address, "latest"],
-        //         }
-        //     );
-        //     const balance = parseInt(response.data.result, 16);
-        //     console.log(response.data);
-        //     console.log("Matic Balance:", balance / 10 ** 18);
-        //     setBalance(balance / 10 ** 18);
-        // } catch (error) {
-        //     console.error("Error retrieving Matic balance:", error);
-        // }
     };
 
     const sendTransaction = async () => {
@@ -70,6 +53,7 @@ const ConnectMetamask = () => {
         const ToAddress = '0x22746588A503434fC1173af62a6Aa82159EBeD25';
         const transaction =
         {
+            from: address,
             to: ToAddress,
             value: amount,
             chainId
@@ -84,6 +68,58 @@ const ConnectMetamask = () => {
         console.log('Transaction was mined in block:', receipt.blockNumber);
 
     };
+
+
+    const newContract = () => {
+        console.log('aaaa0', provider)
+        let web3Provider = new ethers.providers.Web3Provider(provider);
+
+        const contract = new Contract(
+            '0xc8a94a3d3d2dabc3c1caffffdca6a7543c3e3e65',
+            [
+                {
+                    "constant": false,
+                    "inputs": [
+                        {
+                            "name": "_to",
+                            "type": "address"
+                        },
+                        {
+                            "name": "_value",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "transfer",
+                    "outputs": [
+                        {
+                            "name": "",
+                            "type": "bool"
+                        }
+                    ],
+                    "type": "function"
+                }
+            ],
+            web3Provider
+        )
+
+        console.log('aaaa')
+
+        // let web3Provider = new ethers.providers.Web3Provider(provider);
+        // console.log('aaaa1')
+
+
+        const signer = web3Provider.getSigner()
+        console.log('aaaa2')
+
+
+        const aa = contract.connect(signer)
+        console.log('aaaa3')
+
+
+        const txSend = aa.transfer('0x22746588A503434fC1173af62a6Aa82159EBeD25', ethers.utils.parseEther('0.001'))
+        console.log('aaaa4')
+
+    }
 
 
     return (
@@ -122,6 +158,16 @@ const ConnectMetamask = () => {
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.buttonReload} onPress={() => sendTransaction()}>
                         <Text>send</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.buttonReload} onPress={() => newContract()}>
+                        <Text>send Custom</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.buttonReload} onPress={() => {
+                        if (isConnected) {
+                            return provider?.disconnect();
+                        }
+                    }}>
+                        <Text>disconnect</Text>
                     </TouchableOpacity>
                 </View>
                 <WalletConnectModal
