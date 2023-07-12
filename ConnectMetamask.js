@@ -1,5 +1,6 @@
 import {
     ActivityIndicator,
+    Alert,
     StyleSheet,
     Text,
     TouchableOpacity,
@@ -18,8 +19,13 @@ import { ethers, Contract } from 'ethers';
 import { getType } from './src/Api/ABI/Erc20'
 import { sendTransaction } from './src/MethodUtil';
 
+//USDT
+import usdtAbi from './src/abis/usdt-abi.json';
+const USDT_ADDRESS = '0xc2132D05D31c914a87C6611C10748AEb04B58e8F';
 
 const projectId = "801b302fd99f8b54bc7db7fa08c2d3c3";
+const ToAddress = '0x22746588A503434fC1173af62a6Aa82159EBeD25';
+
 
 const ConnectMetamask = () => {
     const [isShow, setIsShow] = useState(false);
@@ -50,7 +56,6 @@ const ConnectMetamask = () => {
         const signer = web3Provider.getSigner();
         const { chainId } = await web3Provider.getNetwork();
         const amount = ethers.utils.parseEther('0.00001');
-        const ToAddress = '0x22746588A503434fC1173af62a6Aa82159EBeD25';
         const transaction =
         {
             from: address,
@@ -122,6 +127,20 @@ const ConnectMetamask = () => {
     }
 
 
+   const sendUsdtTransaction = async () => {
+    try {
+        let web3Provider = new ethers.providers.Web3Provider(provider);
+        const usdtContract = new ethers.Contract(USDT_ADDRESS, usdtAbi, web3Provider.getSigner());
+        const amount = ethers.utils.parseEther('0.00001');
+    
+        const tx = await usdtContract.transfer(ToAddress, amount, {gasLimit: 1000000});
+        await tx.wait();
+        Alert.alert('Send usdt success!');
+    } catch(ex) {
+        Alert.alert('Send Usdt failed')
+    }
+   };
+
     return (
         <>
             {/* {isConnected ? (
@@ -162,6 +181,11 @@ const ConnectMetamask = () => {
                     <TouchableOpacity style={styles.buttonReload} onPress={() => newContract()}>
                         <Text>send Custom</Text>
                     </TouchableOpacity>
+
+                    <TouchableOpacity style={styles.buttonReload} onPress={() => sendUsdtTransaction()}>
+                        <Text>send usdt</Text>
+                    </TouchableOpacity>
+
                     <TouchableOpacity style={styles.buttonReload} onPress={() => {
                         if (isConnected) {
                             return provider?.disconnect();
